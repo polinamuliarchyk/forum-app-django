@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Community Forum</title>
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+
+            <div class="auth-logo">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Join our community and start discussions</p>
+            </div>
+
+            <div class="auth-card">
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div style="background-color: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <small class="form-hint" style="color: #94a3b8; font-size: 12px; margin-top: 5px; display: block;">
+                                    {{ field.help_text|safe }}
+                                </small>
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <div style="color: #ef4444; font-size: 12px; margin-top: 5px;">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary btn-full" style="margin-top: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <line x1="19" x2="19" y1="8" y2="14"></line>
+                            <line x1="22" x2="16" y1="11" y2="11"></line>
+                        </svg>
+                        Create Account
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <div class="auth-links">
+                    <p>Already have an account? <a href="{% url 'login' %}" class="link">Login</a></p>
+                    <a href="{% url 'index' %}" class="link">Continue as guest</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

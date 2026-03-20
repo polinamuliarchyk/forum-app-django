@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <title>Login - Community Forum</title>
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h1 class="auth-title">Community Forum</h1>
+                <p class="auth-subtitle">Welcome back! Please login to continue</p>
+            </div>
+
+            <div class="auth-card">
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div style="background-color: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+
+                            {{ field }}
+
+                            {% if field.errors %}
+                                <div style="color: #ef4444; font-size: 12px; margin-top: 5px;">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" x2="3" y1="12" y2="12"></line>
+                        </svg>
+                        Login
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <div class="auth-links">
+                    <p>Don't have an account? <a href="{% url 'register' %}" class="link">Sign up</a></p>
+                    <a href="{% url 'index' %}" class="link">Continue as guest</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

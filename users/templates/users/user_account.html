@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Community Forum</title>
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="container-small">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="{% url 'index' %}" class="btn btn-ghost">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m12 19-7-7 7-7"></path>
+                            <path d="M19 12H5"></path>
+                        </svg>
+                        Back to Forum
+                    </a>
+                </div>
+                <a href="{% url 'user_update' %}" class="btn btn-primary">Account settings</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container-small">
+            <div class="account-header">
+                <h1 class="page-title">My Account</h1>
+                <p class="page-subtitle">Manage your profile</p>
+            </div>
+
+            <div class="account-card">
+                <div class="account-section">
+                    <h2 class="section-title">Account Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="threadsCount">{{ request.user.articles_set.count }}</div>
+                                <div class="stat-label">Threads Created</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="likesCount">{{ total_likes }}</div>
+                                <div class="stat-label">Likes Received</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="memberSince">{{ user.date_joined|date:"M d, Y" }}</div>
+                                <div class="stat-label">Member Since</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- My Posts Section -->
+            <div class="account-card">
+            <a id="threadsList" class="threads-list">
+                {% if user_posts %}
+                    {% for art in user_posts %}
+                    <a href="{% url 'articles_detail' art.id %}" class="thread-card">
+
+                            <img class="thread-avatar" src="https://ui-avatars.com/api/?name={{ art.title|urlencode }}&background=random" alt="Avatar">
+
+                            <div class="thread-content-wrapper">
+                                <h2 class="thread-title">
+                                    {{ request.user.articles_set.art.title }}
+                                </h2>
+
+                                <div class="thread-meta">
+                                    <span class="author">{{ art.author.username }}</span>
+                                    <span class="category-badge">{{ art.get_category_display }}</span>
+                                    <span class="date">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        {{ art.date }}
+                                    </span>
+                                </div>
+
+                                <p class="thread-excerpt">{{ art.intro }}</p>
+
+                                <div class="thread-stats">
+                                    <span class="stat-item" style="display: flex; align-items: center; gap: 5px;">
+
+                                        <button onclick="event.preventDefault(); toggleLike({{ art.id }})" id="like-btn-{{ art.id }}" class="like-btn {% if request.user in art.likes.all %}liked{% endif %}">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                                            </svg>
+                                        </button>
+
+                                        <span id="like-count-{{ art.id }}" style="font-size:14px;">{{ art.total_likes }}</span> likes
+
+                                    </span>
+                                    <span class="stat-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                        0 replies
+                                    </span>
+                                    <span class="stat-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        {{ art.views }} views
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div id="emptyState" class="empty-state">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <h3>No threads found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                {% endif %}
+                </a>
+        </div>
+        </div>
+    </main>
+
+    </body>
+</html>

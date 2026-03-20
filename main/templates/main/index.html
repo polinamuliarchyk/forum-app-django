@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <title>Community Forum</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+        <div class="header-content">
+
+            <div class="header-left">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="header-title">Community Forum</h1>
+                    <p class="header-subtitle">Share ideas and connect with others</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'article_add' %}" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                        New Thread
+                    </a>
+                    <a href="{% url 'account' %}" class="btn btn-primary">My account</a>
+                    <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+                {% else %}
+                    <a href="{% url 'article_add' %}" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                        New Thread
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+                {% endif %}
+            </div> </div>
+    </div>
+</header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Search Bar -->
+            <div class="search-section">
+                <form method="GET" action="{% url 'index' %}" class="search-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+
+                    <input type="text" name="q" id="searchInput" class="search-input" placeholder="Search discussions..." value="{{ request.GET.q }}">
+
+                    <button type="submit" style="display: none;"></button>
+                </form>
+
+                <!-- Categories -->
+                <div class="categories">
+                    <a href="{% url 'index' %}" class="category-btn {% if not request.GET.category %}active{% endif %}">All</a>
+                    <a href="?category=GEN" class="category-btn {% if request.GET.category == 'General' %}active{% endif %}">General</a>
+                    <a href="?category=TECH" class="category-btn {% if request.GET.category == 'Technology' %}active{% endif %}">Technology</a>
+                    <a href="?category=BOOK" class="category-btn {% if request.GET.category == 'Books' %}active{% endif %}">Books</a>
+                    <a href="?category=LIFE" class="category-btn {% if request.GET.category == 'Lifestyle' %}active{% endif %}">Lifestyle</a>
+                    <a href="?category=HOBB" class="category-btn {% if request.GET.category == 'Hobbies' %}active{% endif %}">Hobbies</a>
+                </div>
+            </div>
+
+            <a id="threadsList" class="threads-list">
+                {% if articles %}
+                    {% for art in articles %}
+                    <a href="{% url 'articles_detail' art.id %}" class="thread-card">
+
+                            <img class="thread-avatar" src="https://ui-avatars.com/api/?name={{ art.title|urlencode }}&background=random" alt="Avatar">
+
+                            <div class="thread-content-wrapper">
+                                <h2 class="thread-title">
+                                    {{ art.title }}
+                                </h2>
+
+                                <div class="thread-meta">
+                                    <span class="author">{{ art.author.username }}</span>
+                                    <span class="category-badge">{{ art.get_category_display }}</span>
+                                    <span class="date">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        {{ art.date }}
+                                    </span>
+                                </div>
+
+                                <p class="thread-excerpt">{{ art.intro }}</p>
+
+                                <div class="thread-stats">
+                                    <span class="stat-item" style="display: flex; align-items: center; gap: 5px;">
+
+                                        <button onclick="event.preventDefault(); toggleLike({{ art.id }})" id="like-btn-{{ art.id }}" class="like-btn {% if request.user in art.likes.all %}liked{% endif %}">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                                            </svg>
+                                        </button>
+
+                                        <span id="like-count-{{ art.id }}" style="font-size:14px;">{{ art.total_likes }}</span> likes
+
+                                    </span>
+                                    <span class="stat-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                        0 replies
+                                    </span>
+                                    <span class="stat-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        {{ art.views }} views
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div id="emptyState" class="empty-state">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <h3>No threads found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                {% endif %}
+                </a>
+            </div>
+        </div>
+    </main>
+<script src="{% static 'main/js/script.js' %}"></script>
+<script src="{% static 'main/js/data.js' %}"></script>
+
+</body>
+</html>

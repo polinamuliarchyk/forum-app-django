@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <title>Create Thread - Community Forum</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container-small">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="{% url 'index' %}" class="btn btn-ghost">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m12 19-7-7 7-7"></path>
+                            <path d="M19 12H5"></path>
+                        </svg>
+                        Back
+                    </a>
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="header-title-small">Create New Thread</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container-small">
+            <div class="form-card">
+
+                <form id="createThreadForm" method="post">
+                    {% csrf_token %}
+
+                    {% if form.errors or errors %}
+                        <div class="alert alert-danger" style="color: #ef4444; margin-bottom: 20px;">
+                            {{ form.errors }}
+                            {{ errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">Thread Title</label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.intro.id_for_label }}" class="form-label">Thread Intro</label>
+                        {{ form.intro }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <div class="categories">
+                            {{ form.category }}
+                            <button type="button" class="category-btn active" data-category="GEN">General</button>
+                            <button type="button" class="category-btn" data-category="TECH">Technology</button>
+                            <button type="button" class="category-btn" data-category="BOOK">Books</button>
+                            <button type="button" class="category-btn" data-category="LIFE">Lifestyle</button>
+                            <button type="button" class="category-btn" data-category="HOBB">Hobbies</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+                        {{ form.content }}
+                    </div>
+
+                    <div class="form-group" style="display: none;">
+                        {{ form.date }}
+                    </div>
+
+                    <div class="guidelines">
+                        <h3 class="guidelines-title">Community Guidelines</h3>
+                        <ul class="guidelines-list">
+                            <li>• Be respectful and kind to other members</li>
+                            <li>• Stay on topic and keep discussions constructive</li>
+                            <li>• No spam, self-promotion, or offensive content</li>
+                            <li>• Use appropriate categories for your threads</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'index' %}" class="btn btn-outline">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="m22 2-7 20-4-9-9-4Z"></path>
+                                <path d="M22 2 11 13"></path>
+                            </svg>
+                            Post Thread
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим все наши кнопки категорий и скрытое поле Django
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const hiddenInput = document.getElementById('hiddenCategoryInput');
+
+        // Если поле пустое, задаем значение по умолчанию (General)
+        if (!hiddenInput.value) {
+            hiddenInput.value = 'GEN';
+        }
+
+        // Вешаем событие клика на каждую кнопку
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 1. Убираем подсветку (класс active) со всех кнопок
+                categoryBtns.forEach(b => b.classList.remove('active'));
+
+                // 2. Добавляем подсветку только той кнопке, на которую нажали
+                this.classList.add('active');
+
+                // 3. Берем значение из data-category и кладем его в скрытое поле Django
+                hiddenInput.value = this.getAttribute('data-category');
+            });
+        });
+    });
+</script>
+</body>
+</html>
