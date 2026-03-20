@@ -27,13 +27,13 @@ Extract the project files into your chosen directory or clone the repo.
 ### 2.  Create a virtual environment (Recommended)
 ``` bash
 python -m venv venv
+```
 
 #### Activation:
 # Windows
 venv\Scripts\activate
 # Linux/Mac
 source venv/bin/activate
-```
 
 ### 3. Install dependencies
 ``` bash 
