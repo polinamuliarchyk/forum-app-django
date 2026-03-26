@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import DetailView
+from django.views.generic import DetailView, UpdateView, DeleteView
 from django.db.models import Q
 from unicodedata import category
 
@@ -44,8 +45,28 @@ class ArticlesDetailsView(DetailView):
 
         return obj
 
+class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Articles
+    template_name = 'main/update_delete_article.html'
+    form_class = ArticlesForm
+
+    def test_func(self):
+        article = self.get_object()
+        return self.request.user == article.author
+
+
+class ArticleDeleteView(LoginRequiredMixin, DeleteView):
+    model = Articles
+    success_url = '/'
+    template_name = 'main/update_delete_article.html'
+
+    def test_func(self):
+        article = self.get_object()
+        return self.request.user == article.author
+
+
+@login_required(login_url='login')
 def add_article(request):
-    error = ''
     if request.method == 'POST':
         form = ArticlesForm(request.POST)
         if form.is_valid():
@@ -54,15 +75,17 @@ def add_article(request):
             article.save()
             return redirect('index')
         else:
-            error = 'Invalid form'
+            errors = form.errors
+
 
     form = ArticlesForm()
     return render(request, 'main/add_article.html', {'form': form})
 
 
+@login_required(login_url='login')
 def like_article(request, pk):
     if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Нужно войти в аккаунт'}, status=401)
+        return JsonResponse({'error': 'You need to log in'}, status=401)
 
     article = get_object_or_404(Articles, id=pk)
 
